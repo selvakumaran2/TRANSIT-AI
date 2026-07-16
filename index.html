@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transit AI — Coimbatore Live Tracker & Digital Ticketing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- Toast notification box (JS will add messages here) -->
+<div id="toast-box"></div>
+
+<!-- ─────────────────────────────────────────────────
+     AUTH SCREEN  (Login / Signup)
+     Hidden once the user logs in
+───────────────────────────────────────────────── -->
+<div id="auth-screen">
+
+  <!-- Left panel: app description -->
+  <div class="auth-left">
+    <div class="auth-logo" style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;">
+      <svg class="sb-logo-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 80px; height: 80px; flex-shrink: 0;">
+        <defs>
+          <linearGradient id="logo-grad-primary-auth" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#14B8A6" />
+            <stop offset="50%" stop-color="#06B6D4" />
+            <stop offset="100%" stop-color="#3B82F6" />
+          </linearGradient>
+          <filter id="logo-neon-glow-auth" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        
+        <circle cx="24" cy="24" r="21" stroke="url(#logo-grad-primary-auth)" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.5" />
+        <circle cx="24" cy="24" r="17" stroke="#3B82F6" stroke-width="0.75" stroke-dasharray="2 3" opacity="0.3" />
+
+        <g filter="url(#logo-neon-glow-auth)">
+          <path d="M12 15C16 13 32 13 36 15L39 19L33 19C28 19 26 21 26 26L26 35C26 37 22 37 22 35L22 26C22 21 20 19 15 19L9 19L12 15Z" fill="url(#logo-grad-primary-auth)" />
+          <circle cx="24" cy="18" r="3.5" fill="#FFFFFF" stroke="#06B6D4" stroke-width="1.5" />
+          <circle cx="12" cy="19" r="2" fill="#14B8A6" />
+          <circle cx="36" cy="19" r="2" fill="#3B82F6" />
+          <circle cx="24" cy="33" r="2.5" fill="#3B82F6" />
+          <path d="M15 17H33" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.75" />
+          <path d="M24 22V30" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.75" />
+        </g>
+      </svg>
+    </div>
+    <h1 class="auth-title">Transit AI</h1>
+    <p class="auth-slogan">Know before you go.<br>Never miss your bus again.</p>
+
+    <div class="auth-features">
+      <div class="auth-feat"><span>🛰️</span><p><strong>Live GPS</strong> — See where your bus is right now</p></div>
+      <div class="auth-feat"><span>💺</span><p><strong>Live Seats</strong> — Know how full the bus is</p></div>
+      <div class="auth-feat"><span>🔔</span><p><strong>Alerts</strong> — Get notified when bus is near</p></div>
+      <div class="auth-feat"><span>🎫</span><p><strong>Digital Ticket</strong> — Book and show QR code</p></div>
+    </div>
+  </div>
+
+  <!-- Right panel: Login / Signup form -->
+  <div class="auth-right">
+    <div class="auth-card">
+
+      <!-- Tab buttons -->
+      <div class="auth-tabs">
+        <button id="tab-login"  class="auth-tab active" onclick="showTab('login')">Log In</button>
+        <button id="tab-signup" class="auth-tab"        onclick="showTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- LOGIN form -->
+      <div id="login-form">
+        <h2>Welcome back 👋</h2>
+        <p class="sub-text">Log in to track buses and book tickets</p>
+
+        <div class="field">
+          <label>Email or Phone</label>
+          <input id="login-id" type="text" placeholder="your@email.com or 9876543210" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="login-pw" type="password" placeholder="Your password (min 6 chars)"
+                 onkeydown="if(event.key==='Enter') doLogin()" />
+        </div>
+
+        <button class="btn primary full" onclick="doLogin()">🚌 Log In</button>
+        <p class="demo-note">Demo: any email + password (min 6 chars)</p>
+      </div>
+
+      <!-- SIGNUP form (hidden by default) -->
+      <div id="signup-form" style="display:none">
+        <h2>Create Account 🎉</h2>
+        <p class="sub-text">Join and start tracking your bus</p>
+
+        <div class="two-col">
+          <div class="field">
+            <label>Full Name</label>
+            <input id="su-name" type="text" placeholder="Ramesh Kumar" />
+          </div>
+          <div class="field">
+            <label>Phone (10 digits)</label>
+            <input id="su-phone" type="tel" placeholder="9876543210" maxlength="10" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input id="su-email" type="email" placeholder="name@email.com" />
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label>Password</label>
+            <input id="su-pw" type="password" placeholder="Min 6 characters" />
+          </div>
+          <div class="field">
+            <label>Confirm Password</label>
+            <input id="su-pw2" type="password" placeholder="Re-enter password" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Home Bus Stop (Optional)</label>
+          <select id="su-home">
+            <option value="">Select a stop...</option>
+            <option value="Gandhipuram">Gandhipuram</option>
+            <option value="Coimbatore Jn">Coimbatore Jn</option>
+            <option value="Ukkadam">Ukkadam</option>
+            <option value="Peelamedu">Peelamedu</option>
+            <option value="Eachanari">Eachanari</option>
+            <option value="Madhampatti">Madhampatti (Rural Foothills)</option>
+            <option value="Alandurai">Alandurai (Ghats Edge)</option>
+            <option value="Negamam">Negamam (Rural Handloom Hub)</option>
+            <option value="Kinathukadavu">Kinathukadavu (Farming Town)</option>
+            <option value="Sultanpet">Sultanpet (Drylands Block)</option>
+            <option value="Vettaikaranpudur">Vettaikaranpudur (Coconut Belt)</option>
+            <option value="Pollachi">Pollachi (Anaimalai Terminus)</option>
+          </select>
+        </div>
+
+        <button class="btn primary full" onclick="doSignup()">🚀 Create Account</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ─────────────────────────────────────────────────
+     MAIN APP  (shown after login)
+───────────────────────────────────────────────── -->
+<div id="main-app" style="display:none">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+
+      <!-- Logo -->
+      <div class="logo" style="cursor: pointer;" onclick="showPage('about')">
+        <svg class="sb-logo-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 40px; height: 40px; flex-shrink: 0;">
+          <defs>
+            <linearGradient id="logo-grad-primary" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#14B8A6" />
+              <stop offset="50%" stop-color="#06B6D4" />
+              <stop offset="100%" stop-color="#3B82F6" />
+            </linearGradient>
+            <filter id="logo-neon-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          
+          <circle cx="24" cy="24" r="21" stroke="url(#logo-grad-primary)" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.4" />
+          <circle cx="24" cy="24" r="17" stroke="#3B82F6" stroke-width="0.75" stroke-dasharray="2 3" opacity="0.25" />
+
+          <g filter="url(#logo-neon-glow)">
+            <path d="M12 15C16 13 32 13 36 15L39 19L33 19C28 19 26 21 26 26L26 35C26 37 22 37 22 35L22 26C22 21 20 19 15 19L9 19L12 15Z" fill="url(#logo-grad-primary)" />
+            <circle cx="24" cy="18" r="3.5" fill="#FFFFFF" stroke="#06B6D4" stroke-width="1.5" />
+            <circle cx="12" cy="19" r="2" fill="#14B8A6" />
+            <circle cx="36" cy="19" r="2" fill="#3B82F6" />
+            <circle cx="24" cy="33" r="2.5" fill="#3B82F6" />
+            <path d="M15 17H33" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.6" />
+            <path d="M24 22V30" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.6" />
+          </g>
+        </svg>
+        <div>
+          <div class="logo-name" style="font-weight: 800; font-size: 19px; background: linear-gradient(135deg, #14B8A6, #3B82F6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Transit AI</div>
+          <div class="logo-sub" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: #64748B;">Live Tracker</div>
+        </div>
+      </div>
+
+      <!-- Nav buttons -->
+      <nav class="nav">
+        <button class="nav-btn active" id="nav-about"     onclick="showPage('about')">🏠 <span>About</span></button>
+        <button class="nav-btn"        id="nav-track"     onclick="showPage('track')">🛰️ <span>Live Track</span></button>
+        <button class="nav-btn"        id="nav-book"      onclick="showPage('book')">🎫 <span>Book</span></button>
+        <button class="nav-btn"        id="nav-scan"      onclick="showPage('scan')">📷 <span>Scan</span></button>
+        <button class="nav-btn"        id="nav-mytickets" onclick="showPage('mytickets')">🗂 <span>My Tickets</span></button>
+        <button class="nav-btn"        id="nav-admin"     onclick="showPage('admin')" style="display:none">⚙️ <span>Admin</span></button>
+      </nav>
+
+      <!-- Clock + User pill -->
+      <div class="header-right">
+        <span class="clock" id="clock">--:--:-- PM</span>
+        <div class="user-pill" onclick="toggleMenu()">
+          <div class="avatar" id="user-av">GU</div>
+          <span id="user-nm" class="hidden md:inline">Guest</span>
+          <span style="font-size:10px">▼</span>
+        </div>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-menu" id="user-menu" style="display:none">
+          <div style="padding:12px;border-bottom:1px solid #EEF2FF">
+            <div id="menu-name" style="font-weight:700;color:#1E293B;font-size:14px">Guest User</div>
+            <div id="menu-email" style="font-size:11px;color:#64748B;margin-top:2px">guest@transitai.in</div>
+          </div>
+          <button class="menu-item-btn" onclick="toggleTheme()" style="width:100%;text-align:left;padding:10px 12px;font-size:13px;color:#475569;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px">
+            🌓 Toggle Dark Mode
+          </button>
+          <button class="menu-item-btn" onclick="doLogout()" style="width:100%;text-align:left;padding:10px 12px;font-size:13px;color:#DC2626;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;border-top:1px solid #EEF2FF">
+            🚪 Log Out
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- ════════════════════════════════
+         PAGE: ABOUT
+         ════════════════════════════════ -->
+    <section id="page-about" class="page active">
+      <div class="about-hero">
+        <div class="hero-text">
+          <span class="text-amber-300 font-mono tracking-widest text-[10px] uppercase block mb-1">Covenant Transit Alliance</span>
+          <h1 class="text-3xl md:text-5xl font-serif font-black tracking-tight mb-3">Redefining Commuting in Coimbatore</h1>
+          <p class="text-xs md:text-sm text-stone-200 font-light leading-relaxed max-w-xl mb-6">
+            Transit AI offers live telemetry, predictive passenger distribution, and context-aware route recommendations, bridging microchimeric familial care loops and digital safety parameters.
+          </p>
+          <div class="flex gap-3">
+            <button class="btn primary" onclick="showPage('track')">🛰️ Track Buses</button>
+            <button class="btn outline" onclick="showPage('book')">🎫 Book Ticket</button>
+          </div>
+        </div>
+        <div class="hero-visual hidden lg:flex">
+          <div class="text-[120px]">🚌</div>
+        </div>
+      </div>
+
+      <!-- Problem solving section -->
+      <h2 class="section-h">😓 Commuter Challenges Solved</h2>
+      <p class="section-sub">We remove friction from your daily travel</p>
+
+      <div class="prob-grid">
+        <div class="prob-card">
+          <div class="prob-num">01</div>
+          <h3>Uncertain Arrival Times</h3>
+          <p>Commit to a stop without knowing if the bus has arrived, left, or is stuck.</p>
+          <div class="solve-tag">✅ Live GPS &amp; ETAs</div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-num">02</div>
+          <h3>Overcrowding Struggles</h3>
+          <p>Boarding heavily packed buses only to stand or suffer anxiety in quiet static.</p>
+          <div class="solve-tag">✅ Real-time Seat Audits</div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-num">03</div>
+          <h3>Silent Relapses &amp; Delays</h3>
+          <p>Buses experiencing delays or disruptions without notifying waiting passengers.</p>
+          <div class="solve-tag">✅ Adaptive Boundary Alerts</div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-num">04</div>
+          <h3>Ticketing &amp; Change Hassles</h3>
+          <p>Handling wet coins, waiting for conductors, or losing printed boarding papers.</p>
+          <div class="solve-tag">✅ QR Tickets in 1 Click</div>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <h2 class="section-h" style="margin-top:3rem">⚙️ How It Works</h2>
+      <p class="section-sub">Three simple steps to seamless boarding</p>
+
+      <div class="steps-row">
+        <div class="step-card">
+          <div class="step-label">Step 1</div>
+          <div class="step-icon">🛰️</div>
+          <h3>Check Telemetry</h3>
+          <p>Find nearby buses with exact occupancy bars, vehicle registration numbers, and arrival clocks.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-label">Step 2</div>
+          <div class="step-icon">🎫</div>
+          <h3>Confirm Pass</h3>
+          <p>Generate a secure digital pass with seat quantity and customized passenger fare multipliers.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-label">Step 3</div>
+          <div class="step-icon">📱</div>
+          <h3>Scan &amp; Board</h3>
+          <p>Conductors use standard camera validation to clear passengers at the gate instantly.</p>
+        </div>
+      </div>
+
+      <!-- Core Innovations and Solutions Grid -->
+      <h2 class="section-h" style="margin-top:3rem">🚀 Key Solutions & Innovations</h2>
+      <p class="section-sub">Cutting-edge smart features designed for Coimbatore's modern commute</p>
+
+      <div class="feat-grid">
+        <div class="feat-card">
+          <span>🗺️</span>
+          <h4>Heatmap Router</h4>
+          <p>Calculates dynamic congestion on regional road segments, helping you bypass gridlocks and choose faster connections.</p>
+        </div>
+        <div class="feat-card">
+          <span>📶</span>
+          <h4>Eco-Sensing Tech</h4>
+          <p>Automatically reduces network payload and optimizes polling intervals for seamless tracking on weak 2G or 3G signals.</p>
+        </div>
+        <div class="feat-card">
+          <span>💺</span>
+          <h4>Seat Load Auditing</h4>
+          <p>Visualizes live bus density (Fluid, Crowded, or Full) directly on the map so you can pick the most comfortable trip.</p>
+        </div>
+        <div class="feat-card">
+          <span>🎫</span>
+          <h4>Instant Clearance</h4>
+          <p>Enables conductors to validate tickets instantly using secure mobile QR passes, avoiding wet cash and long gate queues.</p>
+        </div>
+      </div>
+
+      <!-- Tech stack and solutions overview -->
+      <div class="tech-box">
+        <h3>⚡ Enterprise Cloud Transit Architecture</h3>
+        <div class="tech-pills">
+          <span>Real-Time Telemetry</span>
+          <span>Edge-Optimized Payload</span>
+          <span>Dynamic Fare Scaling</span>
+          <span>Segment Speed Grading</span>
+          <span>Offline QR Validation</span>
+          <span>Regional Grid Sync</span>
+        </div>
+        <p style="margin-top: 12px; line-height: 1.6; max-width: 800px; margin-left: auto; margin-right: auto;">
+          Transit AI operates a localized sub-second vector graphics grid, multi-engine simulation modules, and smart adaptive states to maintain maximum scheduling fidelity. By transforming volatile GPS telemetry and road speed signals into highly structured, actionable transit intelligence, our solutions help commute workforces avoid delays, maximize daily efficiency, and lower the carbon footprint of regional transit.
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════
+         PAGE: LIVE TRACK
+         ════════════════════════════════ -->
+    <section id="page-track" class="page">
+      <div class="page-top">
+        <div>
+          <h2>🛰️ Live Bus Telemetry</h2>
+          <p>Monitor real-time positions, drivers, and seat capacities</p>
+        </div>
+        <span class="live-pill">🟢 ACTIVE SYSTEM</span>
+      </div>
+
+      <!-- Eco / Low Bandwidth Optimization Widget -->
+      <div class="card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.03); margin-bottom: 1.5rem; padding: 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:24px;">📶</div>
+            <div>
+              <h4 style="margin:0; font-size:14px; font-weight:700; color:var(--text);">Eco / Low-Bandwidth Mode</h4>
+              <p style="margin:2px 0 0; font-size:11.5px; color:var(--muted);">Optimizes data usage &amp; rendering for shakier 2G/3G networks in smaller towns</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <label class="switch">
+              <input type="checkbox" id="low-bandwidth-toggle" onchange="toggleLowBandwidth(this.checked)">
+              <span class="slider"></span>
+            </label>
+            <span id="low-bandwidth-status-badge" style="font-size:11px; font-weight:800; color:var(--muted);">OFF</span>
+          </div>
+        </div>
+
+        <div id="eco-metrics-row" style="margin-top:12px; padding-top:12px; border-top:1px dashed rgba(16, 185, 129, 0.2); display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; font-size:12px;">
+          <div>
+            <span style="color:var(--muted); display:block; font-size:10px; font-weight:700; text-transform:uppercase; margin-bottom:2px;">Network Footprint</span>
+            <strong id="eco-net-footprint" style="color:var(--blue);">Standard (Full Payload)</strong>
+          </div>
+          <div>
+            <span style="color:var(--muted); display:block; font-size:10px; font-weight:700; text-transform:uppercase; margin-bottom:2px;">Sync Interval</span>
+            <strong id="eco-sync-interval">Realtime (8s)</strong>
+          </div>
+          <div>
+            <span style="color:var(--muted); display:block; font-size:10px; font-weight:700; text-transform:uppercase; margin-bottom:2px;">Conserved Bandwidth</span>
+            <strong id="eco-saved-bytes" style="color:#10B981;">0.0 KB (0% Saved)</strong>
+          </div>
+          <div>
+            <span style="color:var(--muted); display:block; font-size:10px; font-weight:700; text-transform:uppercase; margin-bottom:2px;">Interactive Map</span>
+            <strong id="eco-map-status" style="color:var(--blue);">Active Render</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="card">
+        <h3>📍 Select Nearby Station</h3>
+        <div class="row-wrap" style="margin-top:1rem">
+          <div class="field f1">
+            <label>Current Stop</label>
+            <select id="track-stop" onchange="renderBusCards()">
+              <option value="">— All Stops —</option>
+              <option>Gandhipuram</option>
+              <option>Coimbatore Jn</option>
+              <option>Ukkadam</option>
+              <option>Peelamedu</option>
+              <option>Eachanari</option>
+              <option>Madhampatti</option>
+              <option>Alandurai</option>
+              <option>Negamam</option>
+              <option>Kinathukadavu</option>
+              <option>Sultanpet</option>
+              <option>Vettaikaranpudur</option>
+              <option>Pollachi</option>
+            </select>
+          </div>
+          <div class="field f1">
+            <label>Going To</label>
+            <select id="track-dest" onchange="renderBusCards()">
+              <option value="">— Any Destination —</option>
+              <option>Gandhipuram</option>
+              <option>Coimbatore Jn</option>
+              <option>Ukkadam</option>
+              <option>Peelamedu</option>
+              <option>Eachanari</option>
+              <option>Madhampatti</option>
+              <option>Alandurai</option>
+              <option>Negamam</option>
+              <option>Kinathukadavu</option>
+              <option>Sultanpet</option>
+              <option>Vettaikaranpudur</option>
+              <option>Pollachi</option>
+            </select>
+          </div>
+          <button class="btn primary" onclick="renderBusCards()">🔍 Filter</button>
+          <button class="btn" onclick="refreshBuses()">↻ Reset Clocks</button>
+        </div>
+        <p id="refresh-time" style="font-size:12px;color:#888;margin-top:8px">Last telemetry sync: —</p>
+      </div>
+
+      <!-- Live Bus Grid -->
+      <div id="bus-grid" class="bus-grid"></div>
+
+      <!-- Live Route Map -->
+      <div class="card" style="margin-top:1.5rem">
+        <div class="card-title-row" style="margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="display:flex; align-items:center; gap:8px;">
+              🗺️ Interactive Transit Map
+            </h3>
+            <p style="margin:2px 0 0; font-size:12px; color:var(--muted);">
+              Live vector telemetry grid with active section speeds &amp; congestion gradings. Hover or click any node to select/inspect.
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="live-pill">LIVE RADAR ACTIVE</span>
+          </div>
+        </div>
+
+        <!-- Layout grid: Canvas on left, detailed metadata + controls on right -->
+        <div class="map-grid-layout" style="display:grid; gap:1.5rem; min-height: 250px;">
+          <!-- Left: Canvas map -->
+          <div style="position:relative; background: var(--gray-100); border-radius: 8px; border: 1px solid var(--border); overflow:hidden; display:flex; flex-direction:column; justify-content:center;">
+            <canvas id="map-canvas" style="display:block; width:100%; border-radius:0; margin-top:0;"></canvas>
+            
+            <!-- Floating Quick Actions -->
+            <div style="position:absolute; bottom:8px; right:8px; display:flex; gap:6px; background:rgba(15,23,42,0.85); backdrop-filter:blur(4px); padding:4px 10px; border-radius:20px; border:1px solid rgba(255,255,255,0.15); font-size:10px; color:white; pointer-events:auto; font-weight:600; letter-spacing:0.5px;">
+              <span style="color:#38BDF8;">📡 Feed Mode:</span>
+              <span id="map-feed-mode">Vector Heatmap</span>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Control & Grading Panel -->
+          <div style="display:flex; flex-direction:column; gap:1rem;">
+            <!-- Map Visualization Toggles -->
+            <div style="padding:14px; border-radius:8px; border:1px dashed var(--border); background:var(--surface);">
+              <h4 style="margin:0 0 10px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted);">Layers &amp; Simulation</h4>
+              
+              <div style="display:flex; flex-direction:column; gap:10px; font-size:12px;">
+                <label style="display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
+                  <span>🔴 Show Congestion Heatmap</span>
+                  <input type="checkbox" id="map-layer-heatmap" checked onchange="toggleMapVisualOption('heatmap')" style="cursor:pointer;" />
+                </label>
+                <label style="display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
+                  <span>🛰️ Render Vector Grid</span>
+                  <input type="checkbox" id="map-layer-grid" checked onchange="toggleMapVisualOption('grid')" style="cursor:pointer;" />
+                </label>
+                <label style="display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
+                  <span>✨ Pulsing Telemetry Packets</span>
+                  <input type="checkbox" id="map-layer-packets" checked onchange="toggleMapVisualOption('packets')" style="cursor:pointer;" />
+                </label>
+              </div>
+            </div>
+
+            <!-- Dynamic Node/Route Inspector -->
+            <div id="map-inspector-box" style="flex:1; padding:14px; border-radius:8px; border:1px solid var(--border); background:rgba(59,107,145,0.05); display:flex; flex-direction:column; justify-content:center; min-height:110px; transition:all 0.2s;">
+              <div id="map-inspector-default" style="text-align:center; color:var(--muted); padding:8px 0;">
+                <div style="font-size:20px; margin-bottom:4px;">🖱️</div>
+                <strong style="font-size:12px; display:block; color:var(--text);">Interactive Inspector</strong>
+                <p style="margin:4px 0 0; font-size:11px; line-height:1.4;">Hover over elements or click a station circle on the map to query telemetry data</p>
+              </div>
+              <div id="map-inspector-content" style="display:none; font-size:12px;">
+                <!-- Filled dynamically by hover/click state -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Segment Speed Index Gradings Grid -->
+        <div style="margin-top:1.25rem; border-top:1px solid var(--border); padding-top:1rem;">
+          <h4 style="margin:0 0 0.75rem; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted); display:flex; align-items:center; gap:6px;">
+            🚦 Coimbatore Regional Road Link Congestion Grades
+          </h4>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+            
+            <div class="grade-indicator" style="display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:6px; border:1.5px solid rgba(16,185,129,0.2); background:rgba(16,185,129,0.03);">
+              <span style="font-size:14px;">🟢</span>
+              <div style="flex:1; line-height:1.25;">
+                <strong style="font-size:11.5px; display:block; color:var(--text);">Fluid Link A-B-E</strong>
+                <span style="font-size:10px; color:var(--muted);">Avg speed: 52 km/h (92% flow index)</span>
+              </div>
+            </div>
+
+            <div class="grade-indicator" style="display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:6px; border:1.5px solid rgba(245,158,11,0.2); background:rgba(245,158,11,0.03);">
+              <span style="font-size:14px;">🟡</span>
+              <div style="flex:1; line-height:1.25;">
+                <strong style="font-size:11.5px; display:block; color:var(--text);">Slow Crawl Link C-D-F</strong>
+                <span style="font-size:10px; color:var(--muted);">Avg speed: 28 km/h (58% flow index)</span>
+              </div>
+            </div>
+
+            <div class="grade-indicator" style="display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:6px; border:1.5px solid rgba(239,68,68,0.2); background:rgba(239,68,68,0.03);">
+              <span style="font-size:14px;">🔴</span>
+              <div style="flex:1; line-height:1.25;">
+                <strong style="font-size:11.5px; display:block; color:var(--text);">Gridlocked Link G-H</strong>
+                <span style="font-size:10px; color:var(--muted);">Avg speed: 9 km/h (18% flow index)</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts System -->
+      <div class="card" style="margin-top:1.5rem">
+        <h3>🔔 Set Arrival Alerter</h3>
+        <p style="color:#888;font-size:13px;margin:.5rem 0 1rem">Be notified automatically when a bus enters a 5-minute radius</p>
+        <div class="row-wrap">
+          <div class="field f1">
+            <label>Alert Station</label>
+            <select id="alert-stop">
+              <option value="">Select stop...</option>
+              <option>Gandhipuram</option>
+              <option>Coimbatore Jn</option>
+              <option>Ukkadam</option>
+              <option>Peelamedu</option>
+              <option>Eachanari</option>
+              <option>Madhampatti</option>
+              <option>Alandurai</option>
+              <option>Negamam</option>
+              <option>Kinathukadavu</option>
+              <option>Sultanpet</option>
+              <option>Vettaikaranpudur</option>
+              <option>Pollachi</option>
+            </select>
+          </div>
+          <div class="field f1">
+            <label>Specific Route</label>
+            <select id="alert-route">
+              <option value="">Any route</option>
+              <option>Route 21C</option>
+              <option>Route 5</option>
+              <option>Route 47A</option>
+              <option>Route 12B</option>
+              <option>Route 70</option>
+              <option>Route 9</option>
+              <option>Route 15M</option>
+            </select>
+          </div>
+          <button class="btn primary" onclick="addAlert()">🔔 Listen For Arrival</button>
+        </div>
+        <div id="alert-list" style="margin-top:1rem"></div>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════
+         PAGE: BOOK TICKET
+         ════════════════════════════════ -->
+    <section id="page-book" class="page">
+      <div class="page-top">
+        <div>
+          <h2>🎫 Secure Booking Engine</h2>
+          <p>Establish boarding permissions and generate credentials</p>
+        </div>
+      </div>
+
+      <div class="book-grid">
+
+        <!-- Booking Panel -->
+        <div class="card">
+          <h3>📝 Trip Parameters</h3>
+
+          <div class="from-to-row" style="margin-top:1rem">
+            <div class="field f1">
+              <label>Boarding Stop</label>
+              <select id="b-from" onchange="updateSeatBar();calcFare()">
+                <option>Gandhipuram</option>
+                <option>Coimbatore Jn</option>
+                <option>Ukkadam</option>
+                <option>Peelamedu</option>
+                <option>Eachanari</option>
+                <option>Madhampatti</option>
+                <option>Alandurai</option>
+                <option>Negamam</option>
+                <option>Kinathukadavu</option>
+                <option>Sultanpet</option>
+                <option>Vettaikaranpudur</option>
+                <option>Pollachi</option>
+              </select>
+            </div>
+            <button class="swap-btn" onclick="swapStops()">⇄</button>
+            <div class="field f1">
+              <label>Destination Stop</label>
+              <select id="b-to" onchange="updateSeatBar();calcFare()">
+                <option>Pollachi</option>
+                <option>Gandhipuram</option>
+                <option>Coimbatore Jn</option>
+                <option>Ukkadam</option>
+                <option>Peelamedu</option>
+                <option>Eachanari</option>
+                <option>Madhampatti</option>
+                <option>Alandurai</option>
+                <option>Negamam</option>
+                <option>Kinathukadavu</option>
+                <option>Sultanpet</option>
+                <option>Vettaikaranpudur</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="field">
+              <label>Route Carrier</label>
+              <select id="b-route" onchange="updateSeatBar()">
+                <option>Route 21C</option>
+                <option>Route 5</option>
+                <option>Route 47A</option>
+                <option>Route 12B</option>
+                <option>Route 70</option>
+                <option>Route 9</option>
+                <option>Route 15M</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Travel Date</label>
+              <input id="b-date" type="date" />
+            </div>
+          </div>
+
+          <!-- Capacity Bar -->
+          <div class="seat-avail-box">
+            <div class="seat-avail-top">
+              <span>💺 Distribution Diagnostics</span>
+              <span class="live-pill" style="font-size:10px">LIVE FEEDS</span>
+            </div>
+            <div class="seat-track">
+              <div id="seat-fill" class="seat-fill-bar"></div>
+            </div>
+            <p id="seat-text" style="font-size:13px;font-weight:600;margin-top:6px"></p>
+          </div>
+
+          <!-- Fare Selections -->
+          <div class="field">
+            <label>Seat Class &amp; Fare Multipliers</label>
+            <div class="seat-type-row">
+              <label class="seat-type-btn active" id="stype-general">
+                <input type="radio" name="stype" value="General" checked onchange="setSeatActive(this);calcFare()" />
+                🪑 General <b>₹20</b>
+              </label>
+              <label class="seat-type-btn" id="stype-ladies">
+                <input type="radio" name="stype" value="Ladies" onchange="setSeatActive(this);calcFare()" />
+                👩 Ladies <b>₹18</b>
+              </label>
+              <label class="seat-type-btn" id="stype-senior">
+                <input type="radio" name="stype" value="Senior Citizen" onchange="setSeatActive(this);calcFare()" />
+                🧓 Senior <b>₹15</b>
+              </label>
+            </div>
+          </div>
+
+          <!-- Interactive Seat Selection Grid -->
+          <div class="field" style="margin-top: 1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label>💺 Interactive Seat Map</label>
+              <span id="selected-seat-badge" class="amber-pill" style="font-size:10px; display:none">SELECTING...</span>
+            </div>
+            <p style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">Select physical seats for your boarding pass:</p>
+            
+            <div class="seat-legend" style="display:flex; gap:10px; font-size:11px; margin-bottom:8px; justify-content: center; background: var(--gray-100); padding: 6px; border-radius: 6px;">
+              <span style="display:flex; align-items:center; gap:4px;"><span style="display:inline-block; width:12px; height:12px; background:var(--surface); border:1px solid var(--border); border-radius:2px;"></span> Available</span>
+              <span style="display:flex; align-items:center; gap:4px;"><span style="display:inline-block; width:12px; height:12px; background:#C084FC; border-radius:2px;"></span> Ladies</span>
+              <span style="display:flex; align-items:center; gap:4px;"><span style="display:inline-block; width:12px; height:12px; background:#F87171; border-radius:2px;"></span> Filled</span>
+              <span style="display:flex; align-items:center; gap:4px;"><span style="display:inline-block; width:12px; height:12px; background:#4ADE80; border-radius:2px;"></span> Chosen</span>
+            </div>
+
+            <div class="bus-container" style="background: var(--gray-100); padding: 12px; border-radius: var(--radius); border: 1px solid var(--border); max-height: 220px; overflow-y: auto;">
+              <div class="bus-front" style="text-align:center; font-size:11px; font-weight:700; color:var(--muted); border-bottom:1px dashed var(--border); padding-bottom:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                <span>⬅️ FRONT (DRIVER)</span>
+                <span style="font-size:12px">🚪 Entry</span>
+              </div>
+              
+              <div id="interactive-seat-grid" class="bus-seat-grid">
+                <!-- Dynamically populated in app.js -->
+              </div>
+            </div>
+            <p id="selected-seats-info" style="font-size:12px; font-weight:700; color:var(--blue); margin-top:8px; text-align:center;">Selected Seats: Auto-Assigned</p>
+          </div>
+
+          <!-- Pass Quantity -->
+          <div class="field">
+            <label>Total Passes</label>
+            <div class="qty-row">
+              <button class="qty-btn" onclick="changeQty(-1)">−</button>
+              <span id="qty-val">1</span>
+              <button class="qty-btn" onclick="changeQty(+1)">+</button>
+            </div>
+          </div>
+
+          <!-- Accounting Summary -->
+          <div class="fare-box">
+            <div class="fare-line"><span>Fare Tier Rate</span>  <span id="f-base">₹20</span></div>
+            <div class="fare-line"><span>Seat Volume</span>       <span id="f-qty">× 1</span></div>
+            <div class="fare-line total"><span>Total Payable</span> <span id="f-total">₹20</span></div>
+          </div>
+
+          <button class="btn primary full" id="book-btn" onclick="bookTicket()">🎫 Generate Ticket</button>
+        </div>
+
+        <!-- Ticket Preview -->
+        <div id="ticket-preview" style="display:none">
+          <div class="card">
+            <div class="card-title-row">
+              <h3>✅ Generated Boarding Pass</h3>
+              <div style="display:flex;gap:6px">
+                <button class="btn" onclick="window.print()">🖨️</button>
+                <button class="btn" onclick="saveTicket()">⬇️ Save Pass</button>
+              </div>
+            </div>
+
+            <div class="ticket-card">
+              <div class="ticket-header">
+                <div>
+                  <div style="font-size:24px">🚌</div>
+                  <div class="ticket-brand">Transit AI</div>
+                  <div class="ticket-brand-sub">Coimbatore Commuter Pass</div>
+                </div>
+                <div class="ticket-valid">✔ VALID</div>
+              </div>
+
+              <div class="ticket-route">
+                <div class="t-stop">
+                  <div class="t-dot blue"></div>
+                  <div id="tk-from">—</div>
+                  <small>BOARDING</small>
+                </div>
+                <div class="t-bus">🚌</div>
+                <div class="t-stop">
+                  <div class="t-dot green"></div>
+                  <div id="tk-to">—</div>
+                  <small>TERMINAL</small>
+                </div>
+              </div>
+
+              <div class="t-dash"></div>
+
+              <div class="t-details">
+                <div class="t-item"><span class="t-lbl">Pass Serial ID</span>  <span id="tk-id">—</span></div>
+                <div class="t-item"><span class="t-lbl">Holder Name</span>  <span id="tk-name">—</span></div>
+                <div class="t-item"><span class="t-lbl">Carrier ID</span>      <span id="tk-route">—</span></div>
+                <div class="t-item"><span class="t-lbl">Booking Date</span>       <span id="tk-date">—</span></div>
+                <div class="t-item"><span class="t-lbl">Class Tier</span>  <span id="tk-seat">—</span></div>
+                <div class="t-item"><span class="t-lbl">Boarding Seats</span>      <span id="tk-qty">—</span></div>
+                <div class="t-item"><span class="t-lbl">Fare Settled</span>  <span id="tk-fare" class="blue-text">—</span></div>
+                <div class="t-item"><span class="t-lbl">Timestamp</span>  <span id="tk-time">—</span></div>
+              </div>
+
+              <div class="t-dash"></div>
+
+              <div class="t-qr-area">
+                <div id="qr-box"></div>
+                <div style="margin-left:1rem">
+                  <p style="font-weight:700" id="tk-qr-id">—</p>
+                  <p style="font-size:12px;color:#888;margin-top:4px">Present this QR code<br>to conductor at door</p>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
+              <button class="btn" onclick="showPage('scan')">📷 Boarding Test</button>
+              <button class="btn primary" onclick="resetBook()">+ Book Another</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State Booking -->
+        <div id="empty-ticket" class="card empty-card">
+          <div style="font-size:56px;margin-bottom:12px">🎫</div>
+          <h4>No boarding pass initialized</h4>
+          <p>Please enter your trip parameters on the left<br>to generate secure boarding credentials.</p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════
+         PAGE: SCAN (Conductor Dashboard)
+         ════════════════════════════════ -->
+    <section id="page-scan" class="page">
+      <div class="page-top">
+        <div>
+          <h2>📷 Gate Verification Panel</h2>
+          <p>Review boarding permissions and scan passenger passes</p>
+        </div>
+        <span class="amber-pill">🎫 GATE AGENT ACTIVE</span>
+      </div>
+
+      <div class="scan-grid">
+
+        <!-- Validation Area -->
+        <div class="card">
+          <h3>🔍 Scan Boarding Pass</h3>
+
+          <div class="scan-box">
+            <div class="scan-corner tl"></div>
+            <div class="scan-corner tr"></div>
+            <div class="scan-corner bl"></div>
+            <div class="scan-corner br"></div>
+            <div class="scan-laser"></div>
+            <p style="color:#888;font-size:13px;margin-top:12px">Awaiting hardware feed...</p>
+          </div>
+
+          <p style="text-align:center;color:#aaa;margin:1rem 0">— MANUAL OVERRIDE —</p>
+
+          <div class="field">
+            <label>Pass Serial ID</label>
+            <input id="scan-input" type="text" placeholder="BUS-00001"
+                   style="font-family:monospace;letter-spacing:2px"
+                   onkeydown="if(event.key==='Enter') validateTicket()" />
+          </div>
+
+          <div style="display:flex;gap:10px">
+            <button class="btn primary" onclick="validateTicket()">✔ Validate Pass</button>
+            <button class="btn" onclick="simulateScan()">🎲 Simulate Scan</button>
+          </div>
+
+          <!-- Scan feedback -->
+          <div id="scan-result" style="display:none;margin-top:1.5rem"></div>
+
+          <!-- Diagnostics -->
+          <div style="margin-top:2rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <h4>💺 Vehicle Distribution Audit</h4>
+              <select id="cond-route" onchange="renderCondSeats()" style="font-size:13px;padding:5px 8px">
+                <option>Route 21C</option>
+                <option>Route 5</option>
+                <option>Route 47A</option>
+                <option>Route 12B</option>
+                <option>Route 70</option>
+                <option>Route 9</option>
+                <option>Route 15M</option>
+              </select>
+            </div>
+            <div id="cond-seats"></div>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="card">
+          <div class="card-title-row">
+            <h3>📋 Cleared Passenger Logs</h3>
+            <button class="btn" style="font-size:12px;padding:5px 10px" onclick="clearScanHistory()">Wipe Logs</button>
+          </div>
+
+          <div id="scan-history">
+            <div class="empty-small">
+              <div style="font-size:32px">📭</div>
+              <p>No transactions cleared</p>
+            </div>
+          </div>
+
+          <div class="scan-counts">
+            <div class="scan-count-item"><span class="green-text" id="sc-valid">0</span><small>Cleared</small></div>
+            <div class="scan-count-item"><span class="red-text"   id="sc-invalid">0</span><small>Rejected</small></div>
+            <div class="scan-count-item"><span class="amber-text" id="sc-used">0</span><small>Duplicate</small></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════
+         PAGE: MY TICKETS
+         ════════════════════════════════ -->
+    <section id="page-mytickets" class="page">
+      <div class="page-top">
+        <div>
+          <h2>🗂 Registered Credentials</h2>
+          <p>Monitor your active passes and travel histories</p>
+        </div>
+        <button class="btn primary" onclick="showPage('book')">+ Book New Pass</button>
+      </div>
+
+      <!-- User's Tickets -->
+      <div id="my-list"></div>
+    </section>
+
+
+    <!-- ════════════════════════════════
+         PAGE: ADMIN PANEL
+         ════════════════════════════════ -->
+    <section id="page-admin" class="page">
+      <div class="page-top">
+        <div>
+          <h2>⚙️ System Administration</h2>
+          <p>Fleet telemetry diagnostics and pass ledgers</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="exportCSV()">📥 Export CSV Ledger</button>
+          <button class="btn danger" onclick="confirmClear()">🗑 Purge Records</button>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stat-grid">
+        <div class="stat-card c-blue">
+          <span class="stat-icon">🎫</span>
+          <div><div class="stat-lbl">Issued Passes</div><div class="stat-num" id="s-total">0</div></div>
+        </div>
+        <div class="stat-card c-green">
+          <span class="stat-icon">👥</span>
+          <div><div class="stat-lbl">Registered Riders</div><div class="stat-num" id="s-users">0</div></div>
+        </div>
+        <div class="stat-card c-amber">
+          <span class="stat-icon">🚌</span>
+          <div><div class="stat-lbl">Active Fleet</div><div class="stat-num" id="s-buses">7</div></div>
+        </div>
+        <div class="stat-card c-purple">
+          <span class="stat-icon">💰</span>
+          <div><div class="stat-lbl">Sovereign Revenue</div><div class="stat-num">₹<span id="s-rev">0</span></div></div>
+        </div>
+      </div>
+
+      <!-- Fleet Table -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <h3 style="margin-bottom:1rem">🚌 Active Carrier Diagnostics</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Route</th><th>Bus Registration</th><th>Driver</th>
+                <th>Current Beacon</th><th>Arrival ETA</th>
+                <th>Total Seats</th><th>Filled</th><th>Empty</th><th>Audited Occupancy</th>
+              </tr>
+            </thead>
+            <tbody id="fleet-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- All Tickets Ledgers -->
+      <div class="card">
+        <div class="card-title-row" style="flex-wrap:wrap;gap:10px">
+          <h3>🗂 Universal Pass Registries</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select id="af-status" onchange="renderAdminTable()">
+              <option value="">All Statuses</option>
+              <option value="valid">Valid</option>
+              <option value="used">Boarded</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <input id="af-search" type="text" placeholder="Search pass holder..."
+                   onkeyup="renderAdminTable()" style="max-width:160px" />
+          </div>
+        </div>
+        <div class="tbl-wrap" style="margin-top:1rem">
+          <table>
+            <thead>
+              <tr>
+                <th>Serial ID</th><th>Pass Holder</th><th>Boarding Path</th>
+                <th>Carrier ID</th><th>Date</th><th>Seats</th><th>Revenue Settled</th>
+                <th>Status</th><th>Override</th>
+              </tr>
+            </thead>
+            <tbody id="admin-body">
+              <tr><td colspan="9" class="empty-row">No records stored in local buffer.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>🚌 Transit AI &copy; 2026 — Secure local transport diagnostics &bull; Coimbatore Division</p>
+    <p><span id="footer-count">0</span> secure credentials stored in active database state</p>
+  </footer>
+
+</div>
+
+
+<!-- ─────────────────────────────────────────────────
+     CONFIRM DIALOG (for destructive actions)
+───────────────────────────────────────────────── -->
+<div id="confirm-overlay" class="overlay" style="display:none" onclick="closeConfirm()">
+  <div class="dialog" onclick="event.stopPropagation()">
+    <div style="font-size:40px;margin-bottom:10px">⚠️</div>
+    <h3 id="confirm-title">Are you sure?</h3>
+    <p id="confirm-msg" style="color:#888;font-size:14px;margin:8px 0 20px"></p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn" onclick="closeConfirm()">Cancel</button>
+      <button class="btn danger" id="confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────
+     AI TRAVEL ASSISTANT (floating chat widget)
+     - Appears on every page once logged in
+     - Uses secure local API proxying to Gemini
+───────────────────────────────────────────────── -->
+<button id="ai-fab" class="ai-fab" onclick="toggleAIChat()" title="Ask AI Travel Assistant" style="display:none">
+  <div class="ai-fab-icon-wrap">
+    <!-- Orbital Rings -->
+    <div class="ai-orbit ai-orbit-1"></div>
+    <div class="ai-orbit ai-orbit-2"></div>
+    <div class="ai-glow-core"></div>
+    <!-- AI Core SVG Symbol -->
+    <svg class="ai-core-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="aiGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FFFFFF" />
+          <stop offset="100%" stop-color="#E0F2FE" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="12" r="4" fill="url(#aiGlow)" />
+      <!-- Surrounding network nodes -->
+      <path d="M12 2V6M12 18V22M2 12H6M18 12H22M5 5L8.5 8.5M15.5 15.5L19 19M5 19L8.5 15.5M15.5 8.5L19 5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </div>
+  <span class="ai-fab-hover-label">Ask Transit AI ✦</span>
+</button>
+
+<div id="ai-panel" class="ai-panel" style="display:none">
+  <div class="ai-panel-header">
+    <div>
+      <strong>🤖 Transit AI Assistant</strong>
+      <p>Ask about Coimbatore routes, delays, or travel tips</p>
+    </div>
+    <button class="ai-close" onclick="toggleAIChat()">✕</button>
+  </div>
+  <div class="ai-platform-subbar" style="background: rgba(37,99,235,0.08); border-bottom: 1px solid var(--border); padding: 6px 16px; display: flex; align-items: center; justify-content: space-between;">
+    <span style="font-size: 11px; font-weight: 700; color: var(--muted);">Engine:</span>
+    <select class="ai-platform-select" id="ai-platform-select-floating" onchange="syncAIEngines(this.value)" style="font-size: 11px; font-weight: 600; padding: 2px 4px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; max-width: 180px;">
+      <option value="gemini">Google Gemini 3.5 Flash</option>
+      <option value="gemini-pro">Google Gemini 3.1 Pro (Reasoning)</option>
+      <option value="gpt4">OpenAI GPT-4o Engine</option>
+      <option value="claude">Anthropic Claude 3.5 Sonnet</option>
+      <option value="deepseek">DeepSeek R1 (Thinking)</option>
+    </select>
+  </div>
+
+  <!-- Suggested quick-ask chips -->
+  <div class="ai-suggestions" id="ai-suggestions">
+    <button class="ai-chip" onclick="askAI('Which bus should I take from Ukkadam to Pollachi?')">Best route?</button>
+    <button class="ai-chip" onclick="askAI('Is it a good time to travel right now or will buses be crowded?')">Crowd advice</button>
+    <button class="ai-chip" onclick="askAI('What should I do if my bus seems delayed?')">Bus delayed?</button>
+    <button class="ai-chip" onclick="askAI('How do I book a ticket on Transit AI?')">How to book?</button>
+  </div>
+
+  <!-- Chat messages appear here -->
+  <div class="ai-messages" id="ai-messages">
+    <div class="ai-msg ai-msg-bot">
+      Hi! I'm your Transit AI Assistant 👋<br>
+      I can suggest routes, explain live seat &amp; GPS data, or help you avoid crowded buses. Ask me anything!
+    </div>
+  </div>
+
+  <!-- Input row -->
+  <div class="ai-input-row">
+    <input id="ai-input" type="text" placeholder="Ask about your journey..."
+           onkeydown="if(event.key==='Enter') sendAIMessage()" />
+    <button class="btn primary" onclick="sendAIMessage()">Send</button>
+  </div>
+</div>
+
+<script src="/app.js" defer></script>
+<script src="/ai-assistant.js" defer></script>
+
+</body>
+</html>

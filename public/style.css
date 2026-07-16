@@ -1,0 +1,1848 @@
+/* ══════════════════════════════════════════════
+   Transit AI — style.css
+   Simple, well-commented CSS for beginners
+   ══════════════════════════════════════════════ */
+
+/* ── 1. RESET & ROOT VARIABLES ────────────────
+   CSS variables let us change colors in one place */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Colors */
+  --blue:        #3B6B91;     /* Mild steel/slate blue */
+  --blue-dark:   #2C5373;     /* Muted dark slate */
+  --blue-light:  #E0E9F2;     /* Ice blue */
+  --blue-soft:   #F3F6F9;     /* Soft slate white */
+  --green:       #4E8975;     /* Soft sage/forest green */
+  --green-light: #EBF2F0;     /* Soft green tinted white */
+  --amber:       #C68B45;     /* Soft ochre/amber */
+  --amber-light: #FAF4EB;     /* Soft cream */
+  --red:         #C25953;     /* Soft warm terracotta red */
+  --red-light:   #F9EFEF;     /* Soft rose white */
+  --purple:      #7F6294;     /* Dusty lavender/purple */
+  --purple-light:#F2EFF4;     /* Lavender tinted white */
+
+  /* Neutral shades */
+  --bg:       #EDF0F5;     /* Soft warm slate grey */
+  --surface:  #FFFFFF;     /* Card background */
+  --border:   #DDE3EC;     /* Border color */
+  --text:     #1E2638;     /* Main text */
+  --muted:    --muted:    #5F6F81;     /* Secondary text */
+  --gray-100: #F4F6F9;
+  --gray-200: #DDE3EC;
+
+  /* Sizing */
+  --radius: 12px;          /* Card corner radius */
+  --radius-sm: 8px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+
+  /* Font */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Dark mode variables */
+[data-theme="dark"] {
+  --bg:       #0F1319;     /* Soft deep dark slate */
+  --surface:  #161D26;     /* Mild navy card */
+  --border:   #242F3E;     /* Muted border */
+  --text:     #E3E8EE;     /* Soft light grey */
+  --muted:    #8D9CAE;     /* Muted steel grey */
+  --gray-100: #1D2633;
+  --gray-200: #29364A;
+  --blue-soft:#1A2430;
+  
+  --blue:        #6CA3C7;     /* Soft muted slate blue for dark mode */
+  --blue-dark:   #4E7D9E;
+  --blue-light:  #253444;
+  --green:       #5CA38B;
+  --green-light: #1C2B26;
+  --amber:       #DCA86A;
+  --amber-light: #2D251A;
+  --red:         #D67C77;
+  --red-light:   #2E1B1B;
+  --purple:      #A18EAD;
+  --purple-light:#241A29;
+}
+
+
+/* ── 2. BASE STYLES ───────────────────────────
+   Applied to the whole page */
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background 0.2s, color 0.2s;
+}
+
+input, select, button {
+  font-family: var(--font);
+}
+
+::selection {
+  background: var(--blue-light);
+  color: var(--blue-dark);
+}
+
+
+/* ── 3. UTILITY CLASSES ───────────────────────
+   Small reusable helpers */
+.blue-text  { color: var(--blue);  font-weight: 700; }
+.green-text { color: var(--green); font-weight: 700; }
+.red-text   { color: var(--red);   font-weight: 700; }
+.amber-text { color: var(--amber); font-weight: 700; }
+
+/* Colored text used inside tables & scan results */
+.f1 { flex: 1; }   /* Makes element fill available space */
+
+
+/* ── 4. TOAST NOTIFICATIONS ──────────────────
+   Pop-up messages at top-right of screen */
+#toast-box {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--blue);
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 240px;
+  animation: slideInRight 0.3s ease;
+}
+.toast.success { border-left-color: var(--green); }
+.toast.error   { border-left-color: var(--red); }
+.toast.warning { border-left-color: var(--amber); }
+.toast.out     { animation: slideOutRight 0.3s ease forwards; }
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes slideOutRight {
+  to { transform: translateX(120%); opacity: 0; }
+}
+
+
+/* ── 5. AUTH SCREEN ───────────────────────────
+   Login / Signup page layout */
+#auth-screen {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Left side: mild steel slate background with features list */
+.auth-left {
+  flex: 1;
+  background: linear-gradient(135deg, var(--blue) 0%, #5B819D 100%);
+  color: white;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 300px;
+}
+
+.auth-logo  { font-size: 52px; margin-bottom: 1rem; }
+.auth-title { font-size: 34px; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; }
+.auth-slogan { font-size: 16px; opacity: 0.85; line-height: 1.7; margin-bottom: 2rem; }
+
+.auth-features { display: flex; flex-direction: column; gap: 16px; }
+.auth-feat { display: flex; align-items: flex-start; gap: 12px; }
+.auth-feat span { font-size: 22px; margin-top: 2px; flex-shrink: 0; }
+.auth-feat p { font-size: 14px; opacity: 0.9; margin: 0; }
+
+/* Right side: white card with form */
+.auth-right {
+  flex: 1;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Tab switcher inside auth card */
+.auth-tabs {
+  display: flex;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 2rem;
+  gap: 4px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.auth-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.auth-card h2   { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.sub-text       { color: var(--muted); font-size: 14px; margin-bottom: 1.5rem; }
+.demo-note      { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+
+/* ── 6. FORM FIELDS ──────────────────────────
+   Inputs, labels, selects */
+.field {
+  margin-bottom: 1rem;
+}
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+input, select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--gray-100);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, select:focus {
+  border-color: var(--blue);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+input::placeholder { color: #94A3B8; }
+
+/* Two-column grid for side-by-side fields */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+
+/* ── 7. BUTTONS ──────────────────────────────
+   All button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn:hover     { background: var(--gray-100); transform: translateY(-1px); }
+.btn.primary   { background: var(--blue); color: white; border-color: var(--blue); box-shadow: 0 4px 12px rgba(59,107,145,0.25); }
+.btn.primary:hover { background: var(--blue-dark); }
+.btn.danger    { background: var(--red); color: white; border-color: var(--red); }
+.btn.danger:hover  { background: #B91C1C; }
+.btn.outline   { background: transparent; border-color: var(--blue); color: var(--blue); }
+.btn.outline:hover { background: var(--blue-soft); }
+.btn.full      { width: 100%; justify-content: center; padding: 13px; margin-top: 0.5rem; }
+
+/* Small swap button between From / To */
+.swap-btn {
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-end;
+  margin-bottom: 1px;
+}
+.swap-btn:hover { background: var(--blue); color: white; border-color: var(--blue); transform: rotate(180deg); }
+
+/* Quantity +/- buttons */
+.qty-row  { display: flex; align-items: center; gap: 0; width: fit-content; border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.qty-btn  { width: 38px; height: 40px; border: none; background: transparent; font-size: 20px; font-weight: 700; color: var(--blue); cursor: pointer; transition: background 0.15s; }
+.qty-btn:hover { background: var(--blue-light); }
+#qty-val  { width: 48px; text-align: center; font-weight: 700; font-size: 17px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); line-height: 40px; }
+
+
+/* ── 8. HEADER ───────────────────────────────
+   Sticky top navigation bar */
+.header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background 0.2s;
+}
+[data-theme="dark"] .header { background: rgba(20, 25, 41, 0.95); }
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 64px;
+}
+
+/* Logo */
+.logo { display: flex; align-items: center; gap: 10px; font-size: 22px; }
+.logo-name { display: block; font-size: 17px; font-weight: 800; color: var(--blue); line-height: 1; }
+.logo-sub  { display: block; font-size: 10px; color: var(--muted); }
+
+/* Nav buttons */
+.nav { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.nav-btn:hover { background: var(--gray-100); color: var(--text); }
+.nav-btn.active { background: var(--blue); color: white; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+
+/* Clock + User pill */
+.header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.clock        { font-size: 13px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.user-pill:hover { background: var(--gray-100); }
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: fixed;
+  top: 72px;
+  right: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow-md);
+  z-index: 200;
+  min-width: 200px;
+  animation: fadeIn 0.2s ease;
+}
+.menu-uname { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
+.menu-email { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 10px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.menu-item:hover  { background: var(--gray-100); }
+.menu-item.danger { color: var(--red); }
+.menu-item.danger:hover { background: var(--red-light); }
+
+
+/* ── 9. MAIN LAYOUT ──────────────────────────
+   Pages and page switching */
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Only the active page is shown */
+.page { display: none; }
+.page.active { display: block; animation: fadeUp 0.3s ease; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+/* ── 10. CARD COMPONENT ─────────────────────
+   White rounded boxes used everywhere */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: background 0.2s;
+}
+.card h3 { font-size: 16px; font-weight: 700; margin-bottom: 1rem; }
+
+/* Title row inside card: title on left, badge on right */
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+
+/* ── 11. PAGE TOP HEADER ROW ─────────────────
+   Used at top of each page */
+.page-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-top h2  { font-size: 24px; font-weight: 800; }
+.page-top p   { color: var(--muted); font-size: 14px; margin-top: 3px; }
+
+
+/* ── 12. PILLS / BADGES ──────────────────────
+   Small colored labels */
+.live-pill {
+  background: var(--green-light);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+}
+.amber-pill {
+  background: var(--amber-light);
+  color: var(--amber);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 50px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 50px;
+  text-transform: uppercase;
+}
+.badge.valid     { background: var(--green-light); color: var(--green); }
+.badge.used      { background: var(--amber-light); color: var(--amber); }
+.badge.cancelled { background: var(--gray-100);    color: var(--muted); }
+
+
+/* ── 13. ROW HELPERS ─────────────────────────
+   Horizontal layouts */
+.row-wrap {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.from-to-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+
+/* ── 14. ABOUT PAGE ──────────────────────────
+   Hero, problem cards, steps, features */
+.about-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--blue), #5B819D);
+  border-radius: 20px;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  color: white;
+  overflow: hidden;
+  position: relative;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.hero-text { flex: 1; min-width: 250px; }
+.hero-bus  { font-size: 48px; margin-bottom: 10px; }
+.about-hero h1  { font-size: 40px; font-weight: 900; letter-spacing: -1px; margin-bottom: 8px; }
+.hero-tag   { font-size: 16px; opacity: 0.85; margin-bottom: 12px; }
+.hero-desc  { font-size: 14px; opacity: 0.8; line-height: 1.7; margin-bottom: 1.5rem; max-width: 420px; }
+.hero-btns  { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.9;
+}
+.big-bus { font-size: 80px; animation: busFloat 2s ease-in-out infinite alternate; }
+.hero-road {
+  width: 200px;
+  height: 8px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 4px;
+  margin-top: 8px;
+}
+@keyframes busFloat {
+  from { transform: translateX(-8px); }
+  to   { transform: translateX(8px); }
+}
+
+/* Section headings */
+.section-h   { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.section-sub { color: var(--muted); font-size: 14px; margin-bottom: 1.5rem; }
+
+/* Problem cards grid */
+.prob-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.prob-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.prob-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+}
+.prob-num  { font-size: 36px; font-weight: 900; color: var(--blue-light); margin-bottom: 8px; line-height: 1; }
+.prob-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.prob-card p  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+.solve-tag    { font-size: 12px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 5px 10px; border-radius: 6px; display: inline-block; }
+
+/* Steps row */
+.steps-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.step-card {
+  flex: 1;
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.step-label { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.step-icon  { font-size: 36px; margin-bottom: 10px; }
+.step-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.step-card p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.step-arrow { font-size: 28px; color: var(--blue-light); font-weight: 700; flex-shrink: 0; }
+
+/* Features grid */
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: transform 0.2s;
+}
+.feat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--blue); }
+.feat-card span  { font-size: 32px; display: block; margin-bottom: 8px; }
+.feat-card h4    { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.feat-card p     { font-size: 12px; color: var(--muted); }
+
+/* Tech box */
+.tech-box {
+  background: var(--gray-100);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+.tech-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+.tech-pills  { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 8px; }
+.tech-pills span {
+  background: var(--blue-light);
+  color: var(--blue-dark);
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.tech-box p  { color: var(--muted); font-size: 13px; }
+
+
+/* ── 15. LIVE TRACK PAGE ─────────────────────
+   Bus cards, map, alerts */
+.bus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Individual bus card */
+.bus-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.bus-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--blue); }
+
+/* Colored top stripe */
+.bus-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+}
+.bus-card.crowded::before { background: linear-gradient(90deg, var(--amber), var(--red)); }
+.bus-card.full::before    { background: var(--red); }
+
+.bc-top    { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.bc-route  { font-size: 17px; font-weight: 800; }
+.bc-id     { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* Green/amber pulsing dot for bus status */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulseDot 1.5s infinite;
+}
+.status-dot.stopped { background: var(--amber); box-shadow: none; animation: none; }
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.3); }
+}
+
+.bc-stops  { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+
+/* GPS location box */
+.bc-gps {
+  background: var(--blue-soft);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gps-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: pulseDot 1.5s infinite;
+  flex-shrink: 0;
+}
+.bc-loc  { font-weight: 700; color: var(--blue); }
+.bc-eta  { font-size: 11px; color: var(--muted); }
+
+/* Seat availability bar inside bus card */
+.bc-seats-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+.bar-track { height: 10px; background: var(--gray-200); border-radius: 50px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 50px; transition: width 0.6s ease; }
+.fill-green { background: linear-gradient(90deg, var(--green), #4ADE80); }
+.fill-amber { background: linear-gradient(90deg, var(--amber), #FCD34D); }
+.fill-red   { background: linear-gradient(90deg, var(--red),   #F87171); }
+
+.bc-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; }
+.bc-book   {
+  padding: 5px 12px;
+  border: 1px solid var(--blue);
+  border-radius: 6px;
+  background: var(--blue-light);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.bc-book:hover { background: var(--blue); color: white; }
+
+/* Map canvas and dynamic layered layouts */
+#map-canvas {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+  background: var(--gray-100);
+}
+
+.map-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .map-grid-layout {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.grade-indicator {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.grade-indicator:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+/* Alert items */
+.alert-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--amber-light);
+  border: 1px solid #FCD34D;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
+  margin-top: 8px;
+}
+.alert-item button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--amber);
+}
+
+
+/* ── 16. BOOK PAGE ───────────────────────────
+   Booking form + ticket preview */
+.book-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Seat availability progress bar */
+.seat-avail-box {
+  background: var(--gray-100);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.seat-avail-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.seat-track { height: 12px; background: var(--gray-200); border-radius: 50px; overflow: hidden; }
+.seat-fill-bar { height: 100%; border-radius: 50px; transition: width 0.6s; }
+
+/* Seat type radio buttons (styled as boxes) */
+.seat-type-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.seat-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+  text-align: center;
+}
+.seat-type-btn input  { display: none; }
+.seat-type-btn:hover  { border-color: var(--blue); background: var(--blue-soft); }
+.seat-type-btn.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+
+/* Fare summary */
+.fare-box {
+  background: var(--blue-soft);
+  border: 1px solid var(--blue-light);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin: 1rem 0;
+}
+.fare-line { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 0; }
+.fare-line span:last-child  { font-weight: 600; }
+.fare-line.total { border-top: 1px dashed var(--blue-light); margin-top: 6px; padding-top: 8px; }
+.fare-line.total span { font-size: 17px; font-weight: 800; color: var(--blue); }
+
+/* Empty ticket placeholder card */
+.empty-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 300px;
+  color: var(--muted);
+}
+.empty-card h4 { font-size: 17px; margin: 10px 0 6px; }
+.empty-card p  { font-size: 14px; }
+
+
+/* ── 17. TICKET CARD (the actual ticket UI) ──
+   Shown after booking */
+.ticket-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+/* Blue header section */
+.ticket-header {
+  background: linear-gradient(135deg, #1D4ED8, #3B82F6);
+  color: white;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ticket-brand     { font-size: 17px; font-weight: 800; }
+.ticket-brand-sub { font-size: 11px; opacity: 0.75; }
+.ticket-valid     { background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: 700; border: 1px solid rgba(255,255,255,0.3); }
+
+/* From / To route display */
+.ticket-route {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  gap: 12px;
+  background: linear-gradient(90deg, var(--blue-soft), white, var(--green-light));
+}
+.t-stop      { text-align: center; flex: 1; }
+.t-dot       { width: 12px; height: 12px; border-radius: 50%; margin: 0 auto 5px; }
+.t-dot.blue  { background: var(--blue); }
+.t-dot.green { background: var(--green); }
+.t-stop div  { font-size: 14px; font-weight: 800; }
+.t-stop small { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.t-bus       { font-size: 22px; }
+
+/* Dashed perforated line (like a real ticket) */
+.t-dash {
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 8px, transparent 8px, transparent 16px);
+  margin: 0 -1px;
+}
+
+/* Details grid: 2 columns */
+.t-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0.25rem 0;
+}
+.t-item {
+  display: flex;
+  flex-direction: column;
+  padding: 9px 1.25rem;
+  border-right: 1px dashed var(--border);
+}
+.t-item:nth-child(even) { border-right: none; }
+.t-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); font-weight: 700; margin-bottom: 2px; }
+.t-item span:last-child { font-size: 13px; font-weight: 600; }
+
+/* QR code area */
+.t-qr-area {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--gray-100);
+}
+#qr-box canvas { border-radius: 6px; border: 3px solid white; }
+
+
+/* ── 18. SCAN PAGE ───────────────────────────
+   Ticket validation UI */
+.scan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Animated scanner box */
+.scan-box {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+/* Four corner brackets */
+.scan-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: var(--blue);
+  border-style: solid;
+}
+.scan-corner.tl { top: 0; left: 0;  border-width: 3px 0 0 3px; border-radius: 8px 0 0 0; }
+.scan-corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 8px 0 0; }
+.scan-corner.bl { bottom: 0; left: 0;  border-width: 0 0 3px 3px; border-radius: 0 0 0 8px; }
+.scan-corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 8px 0; }
+
+/* Moving laser line */
+.scan-laser {
+  position: absolute;
+  left: 10px; right: 10px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  animation: laserScan 2s ease-in-out infinite;
+}
+@keyframes laserScan {
+  0%   { top: 10px; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: calc(100% - 12px); opacity: 0; }
+}
+
+/* Scan result box */
+.scan-result-box {
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-align: center;
+  animation: popIn 0.3s ease;
+}
+.scan-result-box.valid   { background: var(--green-light); border: 2px solid #86EFAC; }
+.scan-result-box.used    { background: var(--amber-light); border: 2px solid #FCD34D; }
+.scan-result-box.invalid { background: var(--red-light);   border: 2px solid #FCA5A5; }
+.scan-result-box .r-icon  { font-size: 36px; display: block; margin-bottom: 6px; }
+.scan-result-box .r-title { font-weight: 800; font-size: 17px; margin-bottom: 4px; }
+.scan-result-box .r-info  { font-size: 13px; color: var(--muted); }
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+/* Scan history entries */
+.scan-entry { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.scan-entry:last-child { border-bottom: none; }
+.scan-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.scan-dot.valid   { background: var(--green); }
+.scan-dot.invalid { background: var(--red); }
+.scan-dot.used    { background: var(--amber); }
+.scan-id    { font-size: 13px; font-weight: 700; font-family: monospace; }
+.scan-info  { font-size: 12px; color: var(--muted); }
+
+/* Scan count totals */
+.scan-counts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; text-align: center; }
+.scan-count-item span  { display: block; font-size: 22px; font-weight: 800; }
+.scan-count-item small { font-size: 11px; color: var(--muted); }
+
+/* Conductor seat display */
+.cond-seat-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.cond-seat {
+  width: 28px; height: 28px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700;
+}
+.cond-seat.free     { background: var(--green-light); color: var(--green); }
+.cond-seat.occupied { background: var(--red-light);   color: var(--red); }
+.cond-seat.ladies   { background: var(--purple-light); color: var(--purple); }
+
+/* Enhanced Conductor Bus Cabin Styles */
+.bus-cabin-frame {
+  background: #1E293B; /* Deep dark slate representing the bus chassis */
+  border-radius: 16px;
+  padding: 16px;
+  border: 2px solid #334155;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.15);
+  margin-bottom: 1rem;
+  color: white;
+  position: relative;
+}
+
+[data-theme="dark"] .bus-cabin-frame {
+  background: #0F172A;
+  border-color: #1E293B;
+}
+
+.bus-cabin-front {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #94A3B8;
+  border-bottom: 2px dashed #334155;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  letter-spacing: 0.5px;
+}
+
+.bus-cabin-rear {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #475569;
+  border-top: 1px solid #334155;
+  padding-top: 8px;
+  margin-top: 14px;
+  letter-spacing: 1px;
+}
+
+.cond-seat-bus-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px 6px;
+  justify-items: center;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom Scrollbar for Seat Bus Grid */
+.cond-seat-bus-grid::-webkit-scrollbar {
+  width: 5px;
+}
+.cond-seat-bus-grid::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+.cond-seat-bus-grid::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+
+.cond-seat-cell {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  transition: all 0.15s ease;
+  user-select: none;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+}
+
+.cond-seat-cell.free {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34D399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+.cond-seat-cell.free:hover {
+  background: rgba(16, 185, 129, 0.35);
+  transform: scale(1.1);
+}
+
+.cond-seat-cell.occupied {
+  background: rgba(239, 68, 68, 0.2);
+  color: #F87171;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.cond-seat-cell.occupied:hover {
+  background: rgba(239, 68, 68, 0.35);
+  transform: scale(1.1);
+}
+
+.cond-seat-cell.ladies {
+  background: rgba(168, 85, 247, 0.2);
+  color: #C084FC;
+  border-color: rgba(168, 85, 247, 0.4);
+}
+.cond-seat-cell.ladies:hover {
+  background: rgba(168, 85, 247, 0.35);
+  transform: scale(1.1);
+}
+
+.cond-seat-cell.corridor {
+  background: transparent !important;
+  border: none !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+.cond-seat-num {
+  display: inline-block;
+}
+
+/* Enhanced Legend */
+.cond-seat-legend-box {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  background: var(--gray-100);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.legend-dot.free { background: #10B981; }
+.legend-dot.occupied { background: #EF4444; }
+.legend-dot.ladies { background: #A855F7; }
+
+/* Enhanced Conductor Stats Grid */
+.cond-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  text-align: center;
+}
+
+.cond-stat-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s;
+}
+.cond-stat-item:hover {
+  transform: translateY(-2px);
+}
+
+.cond-stat-item .lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+.cond-stat-item .num {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 4px 0;
+  line-height: 1;
+}
+
+.cond-stat-item .sub {
+  font-size: 9px;
+  color: var(--muted);
+}
+
+/* Highlighted numbers */
+.num.text-red { color: #EF4444; }
+.num.text-green { color: #10B981; }
+.num.text-blue { color: #3B82F6; }
+
+/* Progress slider */
+.cond-progress-wrapper {
+  margin-top: 12px;
+}
+
+.cond-progress-track {
+  background: var(--gray-200);
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cond-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.cond-progress-fill.green { background: #10B981; }
+.cond-progress-fill.amber { background: #F59E0B; }
+.cond-progress-fill.red { background: #EF4444; }
+
+.empty-small { text-align: center; padding: 2rem; color: var(--muted); }
+.empty-small div { font-size: 32px; margin-bottom: 8px; }
+
+
+/* ── 19. MY TICKETS PAGE ─────────────────────
+   List of passenger's own tickets */
+.my-ticket-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+}
+.my-ticket-row:hover { box-shadow: var(--shadow-md); border-color: var(--blue); }
+
+/* Left colored stripe based on status */
+.mtr-stripe { width: 5px; align-self: stretch; border-radius: 5px; flex-shrink: 0; }
+.mtr-stripe.valid     { background: var(--green); }
+.mtr-stripe.used      { background: var(--amber); }
+.mtr-stripe.cancelled { background: var(--gray-200); }
+
+.mtr-body   { flex: 1; }
+.mtr-id     { font-size: 13px; font-family: monospace; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+.mtr-route  { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.mtr-meta   { font-size: 12px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.mtr-right  { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.mtr-fare   { font-size: 18px; font-weight: 800; color: var(--blue); }
+
+
+/* ── 20. ADMIN PAGE ──────────────────────────
+   Stats, fleet table, all tickets */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+.c-blue   { background: linear-gradient(135deg, #2563EB, #3B82F6); }
+.c-green  { background: linear-gradient(135deg, #16A34A, #22C55E); }
+.c-amber  { background: linear-gradient(135deg, #D97706, #F59E0B); }
+.c-purple { background: linear-gradient(135deg, #7C3AED, #8B5CF6); }
+
+.stat-icon { font-size: 30px; }
+.stat-lbl  { font-size: 11px; opacity: 0.85; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.stat-num  { font-size: 28px; font-weight: 800; }
+
+/* Scrollable table wrapper */
+.tbl-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+table     { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead     { background: var(--gray-100); }
+th { text-align: left; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--blue-soft); }
+.empty-row { text-align: center; color: var(--muted); padding: 2rem; }
+
+/* Occupancy bar inside fleet table */
+.occ-bar  { width: 80px; height: 8px; background: var(--gray-200); border-radius: 50px; overflow: hidden; display: inline-block; }
+.occ-fill { height: 100%; border-radius: 50px; }
+
+/* Action buttons inside table */
+.tbl-act { display: flex; gap: 4px; }
+.act-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.act-btn:hover        { background: var(--gray-100); }
+.act-btn.red          { color: var(--red); }
+.act-btn.red:hover    { background: var(--red-light); border-color: var(--red); }
+
+
+/* ── 21. CONFIRM DIALOG ──────────────────────
+   Full-screen overlay with confirmation box */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  animation: fadeIn 0.2s ease;
+}
+.dialog {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  animation: popIn 0.3s ease;
+}
+.dialog h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+
+
+/* ── 22. FOOTER ──────────────────────────────
+   Bottom bar */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 3rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* ── 23. PRINT STYLES ────────────────────────
+   Only the ticket shows when printing */
+@media print {
+  .header, .nav, .footer, #toast-box,
+  #auth-screen, .hero-btns, .hero-btns,
+  .page-top button { display: none !important; }
+  .page      { display: block !important; }
+  .book-grid { grid-template-columns: 1fr; }
+  body       { background: white; }
+}
+
+
+/* ── 24. RESPONSIVE MOBILE ───────────────────
+   Adjustments for small screens */
+@media (max-width: 768px) {
+  #auth-screen { flex-direction: column; }
+  .auth-left   { min-width: unset; padding: 2rem; }
+  .auth-features { display: none; } /* hide feature list on mobile auth */
+  .header-inner  { flex-wrap: wrap; height: auto; padding: 0.75rem 1rem; }
+  .nav-btn span:last-child { display: none; } /* show only icon on mobile */
+  .two-col       { grid-template-columns: 1fr; }
+  .book-grid     { grid-template-columns: 1fr; }
+  .scan-grid     { grid-template-columns: 1fr; }
+  .stat-grid     { grid-template-columns: 1fr 1fr; }
+  .steps-row     { flex-direction: column; }
+  .step-arrow    { transform: rotate(90deg); }
+  .clock         { display: none; }
+  .about-hero    { flex-direction: column; text-align: center; }
+  .hero-visual   { display: none; }
+  .t-details     { grid-template-columns: 1fr; }
+  .t-item        { border-right: none !important; }
+}
+
+
+/* ══════════════════════════════════════════════
+   25. AI TRAVEL ASSISTANT WIDGET
+   Floating chat button + slide-up chat panel
+   ══════════════════════════════════════════════ */
+
+/* Floating round button, bottom-right corner */
+.ai-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(59, 107, 145, 0.4);
+  z-index: 400;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-fab:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(59, 107, 145, 0.5);
+}
+
+.ai-fab-icon-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-glow-core {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 12px 6px rgba(255, 255, 255, 0.8), 0 0 20px 10px rgba(127, 98, 148, 0.4);
+  animation: aiCorePulse 2s ease-in-out infinite alternate;
+}
+
+.ai-orbit {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+}
+
+.ai-orbit-1 {
+  width: 32px;
+  height: 16px;
+  transform: rotate(30deg);
+  animation: rotateOrbit1 3.5s linear infinite;
+}
+
+.ai-orbit-2 {
+  width: 32px;
+  height: 16px;
+  transform: rotate(-30deg);
+  animation: rotateOrbit2 4.5s linear infinite;
+}
+
+.ai-core-svg {
+  position: relative;
+  z-index: 5;
+  animation: aiCoreRotate 12s linear infinite;
+}
+
+.ai-fab-hover-label {
+  position: absolute;
+  right: 70px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 6px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.ai-fab:hover .ai-fab-hover-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@keyframes aiCorePulse {
+  0% { transform: scale(0.9); box-shadow: 0 0 8px 4px rgba(255, 255, 255, 0.8); }
+  100% { transform: scale(1.1); box-shadow: 0 0 16px 8px rgba(255, 255, 255, 0.9); }
+}
+
+@keyframes rotateOrbit1 {
+  0% { transform: rotate(30deg) rotateY(0deg); }
+  100% { transform: rotate(30deg) rotateY(360deg); }
+}
+
+@keyframes rotateOrbit2 {
+  0% { transform: rotate(-30deg) rotateY(360deg); }
+  100% { transform: rotate(-30deg) rotateY(0deg); }
+}
+
+@keyframes aiCoreRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Chat panel */
+.ai-panel {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  height: 480px;
+  max-height: calc(100vh - 140px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-md);
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popIn 0.25s ease;
+}
+
+/* Header */
+.ai-panel-header {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: white;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.ai-panel-header strong { font-size: 15px; display: block; }
+.ai-panel-header p      { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+.ai-close {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* Quick-ask suggestion chips */
+.ai-suggestions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.ai-chip {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border: 1px solid var(--blue-light);
+  border-radius: 50px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ai-chip:hover { background: var(--blue-light); }
+
+/* Scrollable message list */
+.ai-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Individual chat bubble */
+.ai-msg {
+  max-width: 85%;
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.ai-msg-bot {
+  background: var(--gray-100);
+  color: var(--text);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+.ai-msg-user {
+  background: var(--blue);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+/* "Typing..." animation bubble */
+.ai-typing {
+  display: flex;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 12px 14px;
+  background: var(--gray-100);
+  border-radius: 14px;
+  border-bottom-left-radius: 4px;
+}
+.ai-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: typingDot 1.2s infinite;
+}
+.ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%            { opacity: 1;   transform: translateY(-3px); }
+}
+
+/* Input row at bottom */
+.ai-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+.ai-input-row input {
+  flex: 1;
+  margin: 0;
+}
+.ai-input-row .btn {
+  padding: 10px 16px;
+}
+
+/* Mobile: full width panel */
+@media (max-width: 480px) {
+  .ai-panel { right: 16px; left: 16px; width: auto; bottom: 88px; }
+  .ai-fab   { right: 16px; bottom: 16px; }
+}
+
+/* ── 20. INTERACTIVE SEAT SELECTION ────────────────── */
+.bus-seat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 2 seats, 1 corridor gap, 2 seats */
+  gap: 8px 6px;
+  justify-items: center;
+}
+
+.seat-cell {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+  color: var(--text);
+}
+
+.seat-cell:hover {
+  border-color: var(--blue);
+  transform: scale(1.08);
+}
+
+.seat-cell.corridor {
+  background: transparent !important;
+  border: none !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+.seat-cell.occupied {
+  background: #FCA5A5 !important;
+  color: #B91C1C !important;
+  border-color: #EF4444 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.seat-cell.ladies {
+  background: #F3E8FF;
+  border-color: #C084FC;
+  color: #7C3AED;
+}
+
+.seat-cell.ladies:hover {
+  background: #E9D5FF;
+}
+
+.seat-cell.selected {
+  background: #4ADE80 !important;
+  border-color: #22C55E !important;
+  color: white !important;
+  box-shadow: 0 0 8px #22C55E;
+}
+
+/* Amenities and Speed badges inside Bus Cards */
+.bc-amenity-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.bc-amenity-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.bc-speed-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue);
+  background: var(--blue-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── 21. ECO / LOW BANDWIDTH SWITCH ────────────────── */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border);
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.switch input:checked + .slider {
+  background-color: #10B981;
+}
+
+.switch input:focus + .slider {
+  box-shadow: 0 0 1px #10B981;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(20px);
+}

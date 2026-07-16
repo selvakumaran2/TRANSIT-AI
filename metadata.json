@@ -1,0 +1,6 @@
+{
+  "name": "Transit AI",
+  "description": "An intelligent transit and bus tracking platform for Coimbatore and Pollachi commuters featuring interactive seat selection, a low-bandwidth eco mode, and multi-engine conversational AI integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
